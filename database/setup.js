@@ -1,5 +1,5 @@
 const path = require("path");
-const { Sequelize } = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 require("dotenv").config();
 
 const environment = process.env.NODE_ENV || "development";
@@ -29,12 +29,51 @@ const sequelize = new Sequelize({
 	logging: false
 });
 
+const Track = sequelize.define(
+	"Track",
+	{
+		trackId: {
+			type: DataTypes.INTEGER,
+			primaryKey: true,
+			autoIncrement: true
+		},
+		songTitle: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		artistName: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		albumName: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		genre: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		duration: {
+			type: DataTypes.INTEGER
+		},
+		releaseYear: {
+			type: DataTypes.INTEGER
+		}
+	},
+	{
+		tableName: "tracks",
+		timestamps: false
+	}
+);
+
 async function initializeDatabase() {
 	try {
 		await sequelize.authenticate();
+		await sequelize.sync();
 		console.log(
 			`Connected to SQLite database at ${selectedConfig.storage} (${environment}).`
 		);
+		console.log("Tracks table is ready.");
 	} catch (error) {
 		console.error("Unable to connect to the database:", error);
 		process.exitCode = 1;
@@ -47,6 +86,7 @@ if (require.main === module) {
 
 module.exports = {
 	sequelize,
+	Track,
 	databaseConfig,
 	initializeDatabase
 };
