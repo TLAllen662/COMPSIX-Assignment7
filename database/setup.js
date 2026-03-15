@@ -66,7 +66,7 @@ const Track = sequelize.define(
 	}
 );
 
-async function initializeDatabase() {
+async function initializeDatabase({ closeConnection = true } = {}) {
 	try {
 		await sequelize.authenticate();
 		await sequelize.sync();
@@ -77,6 +77,11 @@ async function initializeDatabase() {
 	} catch (error) {
 		console.error("Unable to connect to the database:", error);
 		process.exitCode = 1;
+	} finally {
+		if (closeConnection) {
+			await sequelize.close();
+			console.log("Database connection closed.");
+		}
 	}
 }
 
